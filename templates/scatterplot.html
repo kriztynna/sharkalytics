@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: deals and valuation trends</title>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <style>
+          #scatterplot {
+            padding-left:29px;
+          }
+          .axis {
+            font-size: 11px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 300;
+          }
+          .axis path,
+          .axis line {
+            fill: none;
+            stroke: #555;
+            shape-rendering: crispEdges;
+          }
+          .label {
+            font-size: 100%;
+            font-weight: 300;
+            font-family: 'Open Sans', sans-serif;
+          }
+          .legend-text {
+            font-size: 12px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 300;
+          }
+          .dot {
+            stroke: none;
+          }
+          .dot:hover { 
+            stroke: #000;
+          }
+          .d3-tip {
+            line-height: 1.25;
+            font-weight: 300;
+            font-size: 11px;
+            font-family: 'Open Sans', sans-serif;
+            padding: 0em;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            border-radius: 2px;
+          }
+
+          /* Creates a small triangle extender for the tooltip */
+          .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 1px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+          }
+
+          /* Style northward tooltips differently */
+          .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+          }
+          .trendline {
+            stroke: #555;
+            stroke-width: 1;
+          }
+          .oneToOneLine {
+            stroke: #555;
+            stroke-width: 1;
+            stroke-dasharray: 5,5;
+          }
+          .text-label{
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+          }
+          .trendline_legend {
+            stroke: #555;
+            stroke-width: 1;
+          }
+          .oneToOneLine_legend {
+            stroke: #555;
+            stroke-width: 1;
+            stroke-dasharray: 5,5;
+          }
+        </style>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+          <span class="card-title">Deals and valuation trends</span>
+        </div>
+
+        <div class="card">
+          <span class="small-title"><b>All deals: asking vs. deal valuation</b></span>
+          <svg id="scatterplot"></svg>
+        </div>
+          
+        <!-- script for first graph -->
+        <script>
+          var margin = {top: 20, right: 60, bottom: 30, left: 40},
+              width = parseInt(d3.select('.card').style('width'), 10)-21-29, /* 21px for the pad in .card, + 29px to match the left pad in the chart */
+              width = width - margin.left - margin.right,
+              height = 500 - margin.top - margin.bottom;
+
+          // formatters
+          var formatDollar = d3.format("$,");
+          var decimalFormat = d3.format(",.2f");
+
+          /* 
+           * value accessor - returns the value to encode for a given data object.
+           * scale - maps value to a visual display encoding, such as a pixel position.
+           * map function - maps from data value to display value
+           * axis - sets up axis
+           */ 
+
+          // setup x 
+          var xValue = function(d) { return d.Asking;}, // data -> value
+              xScale = d3.scale.linear().range([0, width]), // value -> display
+              xMap = function(d) { return xScale(xValue(d));}, // data -> display
+              xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(6).tickFormat(formatDollar);
+
+          // setup y
+          var yValue = function(d) { return d["Deal"];}, // data -> value
+              yScale = d3.scale.linear().range([height, 0]), // value -> display
+              yMap = function(d) { return yScale(yValue(d));}, // data -> display
+              yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(6).tickFormat(formatDollar);
+
+          // setup fill color
+          var cValue = function(d) { return d.Investor;},
+              color = d3.scale.category10();
+
+          // add the graph canvas to the body of the webpage
+          var svg = d3.select("#scatterplot")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom + 30) /* give an extra 30 for the legend at the bottom */
+            .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          // add the tooltip area to the webpage
+          var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) {
+              return "<span>"+d["Company"]+"</span><br><span>Asking val: "+formatDollar(d["Asking"])+"</span><br><span>Deal val: "+formatDollar(d["Deal"])+"</span>";
+          })
+
+          svg.call(tip);
+
+          // load data
+          d3.csv("/chartdata/scatterplot_sharks", function(error, data) {
+
+            // change string (from CSV) into number format
+            data.forEach(function(d) {
+              d.Asking = +d.Asking;
+              d["Deal"] = +d["Deal"];
+             // console.log(d);
+            });
+
+            // don't want dots overlapping axis, so add in buffer to data domain
+            xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
+            yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+
+            // x-axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+              .append("text")
+                .attr("class", "label")
+                .attr("x", width)
+                .attr("y", -6)
+                .style("text-anchor", "end")
+                .text("Asking valuation");
+
+            // y-axis
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+              .append("text")
+                .attr("class", "label")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Deal valuation");
+
+            // draw dots
+            svg.selectAll(".dot")
+                .data(data)
+              .enter().append("circle")
+                .attr("class", "dot")
+                .attr("r", 3.5)
+                .attr("cx", xMap)
+                .attr("cy", yMap)
+                .style("fill", function(d) {
+                  return color(cValue(d));}) 
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide);
+
+            // draw legend
+            var legend = svg.selectAll(".legend")
+                .data(color.domain())
+              .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function(d, i) { return "translate("+ i * 120 + ", 0)"; });
+
+            // draw legend colored circles
+            legend.append("circle")
+                .attr("r", 9)
+                .attr("cx", 4.5)
+                .attr("cy", height+40)
+                .style("fill", color);
+
+            // draw legend text
+            legend.append("text")
+                .attr("x", 18)
+                .attr("y", height+40)
+                .attr("dy", ".35em")
+                .attr("class", "legend-text")
+                .style("text-anchor", "start")
+                .text(function(d) { return d;})
+
+            // draw legend for lines
+            var legend_for_lines = svg.selectAll(".legend_for_lines")
+                .data([1])
+              .enter().append("g")
+                .attr("class", "legend_for_lines")
+
+            legend_for_lines.append("line")
+              .attr("class", "trendline_legend")
+              .attr("x1", 235)
+              .attr("y1", height+40)
+              .attr("x2", 253)
+              .attr("y2", height+40);
+
+            legend_for_lines.append("text")
+                .attr("x", 257)
+                .attr("y", height+40)
+                .attr("dy", ".35em")
+                .attr("class", "legend-text")
+                .style("text-anchor", "start")
+                .text("best fit line");
+
+            legend_for_lines.append("line")
+              .attr("class", "oneToOneLine_legend")
+              .attr("x1", 350)
+              .attr("y1", height+40)
+              .attr("x2", 368)
+              .attr("y2", height+40);
+
+            legend_for_lines.append("text")
+                .attr("x", 372)
+                .attr("y", height+40)
+                .attr("dy", ".35em")
+                .attr("class", "legend-text")
+                .style("text-anchor", "start")
+                .text("1:1 line");
+
+            // draw 1-to-1 line
+            var one_to_one_data = [[d3.min(data, xValue)-1,d3.min(data, yValue)-1,d3.max(data, xValue)+1,d3.max(data, yValue)+1]];
+
+            var oneToOneLine = svg.selectAll(".oneToOneLine")
+              .data(one_to_one_data)
+
+            oneToOneLine.enter()
+              .append("line")
+              .attr("class", "oneToOneLine")
+              .attr("x1", function(d) { return xScale(d[0]); })
+              .attr("y1", function(d) { return yScale(d[1]); })
+              .attr("x2", function(d) { return xScale(d[2]); })
+              .attr("y2", function(d) { return yScale(d[3]); });
+
+            // get the x and y values for least squares
+            var xSeries = data.map(function(d) { return parseFloat(d['Asking']); });
+            var ySeries = data.map(function(d) { return parseFloat(d['Deal']); });
+            
+            var leastSquaresCoeff = leastSquares(xSeries, ySeries),
+              slope = leastSquaresCoeff[0],
+              y_intercept = leastSquaresCoeff[1],
+              r2 = leastSquaresCoeff[2];
+            
+            // apply the results of the least squares regression
+            var x1 = 0; // copied from xScale definition further up
+            var y1 = ( leastSquaresCoeff[0] * x1 ) + leastSquaresCoeff[1];
+            var x2 = d3.max(data, xValue)+1;
+            var y2 = ( leastSquaresCoeff[0] * x2 ) + leastSquaresCoeff[1];
+            var trendData = [[x1,y1,x2,y2]];
+            
+            var trendline = svg.selectAll(".trendline")
+              .data(trendData);
+              
+            trendline.enter()
+              .append("line")
+              .attr("class", "trendline")
+              .attr("x1", function(d) { return xScale(d[0]); })
+              .attr("y1", function(d) { return yScale(d[1]); })
+              .attr("x2", function(d) { return xScale(d[2]); })
+              .attr("y2", function(d) { return yScale(d[3]); });
+
+            // display equation on the chart
+            svg.append("text")
+              .text("Slope: "+decimalFormat(leastSquaresCoeff[0]))
+              .attr("class", "text-label")
+              .attr("x", function(d) {return xScale(x2) - 60;})
+              .attr("y", function(d) {return yScale(y2) - 20;})
+              .style("text-anchor", "start");
+            
+            // display r-square on the chart
+            svg.append("text")
+              .html("R&#178;: " + decimalFormat(leastSquaresCoeff[2]))
+              .attr("class", "text-label")
+              .attr("x", function(d) {return xScale(x2) - 60;})
+              .attr("y", function(d) {return yScale(y2) - 0;})
+              .style("text-anchor", "start");
+          });
+
+          // returns slope, intercept and r-square of the line
+          function leastSquares(xSeries, ySeries) {
+            var reduceSumFunc = function(prev, cur) { return prev + cur; };
+            
+            var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
+            var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+
+            var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
+              .reduce(reduceSumFunc);
+            
+            var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
+              .reduce(reduceSumFunc);
+              
+            var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
+              .reduce(reduceSumFunc);
+              
+            var slope = ssXY / ssXX;
+            var intercept = yBar - (xBar * slope);
+            var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+            
+            return [slope, intercept, rSquare];
+          }
+        </script>
+    {% endblock %}

@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: {{ name }}</title>
+        <style>
+        .alert {
+            display: none;
+        }
+        </style>
+        <!-- Google Analytics Events -->
+            <script>
+                var trackOutboundLink = function(url) {
+                   ga('send', 'event', 'outbound', 'click', url, {'hitCallback':
+                     function () {
+                     }
+                   });
+                }
+                // outbound is the event category, click is the event action and the url variable in this case becomes the event label
+                var trackAMZNLink = function(product, url) {
+                   ga('send', 'event', 'amazon referral', 'click', product, {'hitCallback':
+                     function () {
+                     }
+                   });
+                }
+                // in this case the url wouldn't tell us much, so we use the company/product name instead
+            </script>
+    {% endblock%}
+
+    {% block body %}
+        <div id="confirm_div"></div>
+        
+        <div class="card top-card">
+            <span class="card-title">{{ name }}</span>
+            <span id="buttons" style="float: right;"><input id="editcompany" type="button" class="btn btn-default" value="edit" onclick="editCompany();" /></span>
+        </div>
+
+        <div class="card" id="info_card">
+            <span class="small-title"><b>info</b></span>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td class="left-col">appeared in</td>
+                        <td>
+                            {% set seasonlink = '/episodes' %}
+                            {% set episodelink = '/episode/' ~ EPID %}
+                            <a href={{ seasonlink }}>season {{ season }}</a>,  <a href={{ episodelink }}>episode {{ epnumber }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>entrepreneurs</td>
+                        <td id="people">{{ people }}</td>
+                    </tr>
+                    <tr>
+                        <td>category</td>
+                        {% if CatID %}
+                            {% set categorylink='/category/'~ CatID %}
+                        {% else %}
+                            {% set categorylink='' %}
+                        {% endif %}
+                        <td id="cat_row"><a href={{ categorylink }}><span id="cat">{{ category }}</span></a></td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td id="desc">{{ desc }}</td>
+                    </tr>
+                    <tr>
+                        <td>company website</td>
+                        {% if website %}
+                            {% set trackinglink="'"~ website ~"'" %}
+                        {% else %}
+                            {% set trackinglink='' %}
+                        {% endif %}
+                        <td id="web_row"><a href={{ website }} onclick="trackOutboundLink( {{ trackinglink }} ); return true;" target="_blank" rel="nofollow"><span id="website">{{ website }}</span></a></td>
+                    </tr>                
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <span class="small-title"><b>pitch</b></span>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td class="left-col">asked for</td>
+                        <td>{{ ask_usd }}</td>
+                    </tr>
+                    <tr>
+                        <td>in exchange for</td>
+                        <td>{{ ask_pct }} equity stake</td>
+                    </tr>
+                    <tr>
+                        <td>implied valuation</td>
+                        <td>{{ ask_val }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="deal_info"></div>
+        <div id="ecommerce"></div>
+        <div id="disqus_thread"></div>
+
+        <!-- JavaScript -->
+        <script type="text/javascript">
+
+            // get all the current values from fields and from app
+            var website = $( "#website" ).html();
+            var people = $( "#people" ).html();
+            var desc = $( "#desc" ).html();
+            var cat = $( "#cat" ).html();
+            var current_data = {"website":website, "people":people, "desc": desc, "cat": cat}
+
+            var investor_ids = {{ investor_ids|safe }};
+            var investor_names = {{ investor_names|safe }};
+            var deal = {{ deal }};
+            var submit = {{ submit }};
+
+            var buyit = {{ buyit }}
+
+            var _gaq = _gaq || [];
+
+            function insertDeal() {
+                var deal_card_start = '<div class="card"><span class="small-title"><b>deal</b></span><table class="table"><tbody>';
+                if (deal==1){
+                    var deal_table = '<tr><td class="left-col">investment received</td><td>{{ deal_usd }}</td></tr><tr><td>in exchange for</td><td>{{ deal_pct }} equity stake</td></tr><tr><td>implied valuation</td><td>{{ deal_val }}</td></tr><tr><td>other terms</td><td>{{ other_terms }}</td></tr></tbody></table></div>';
+                    var deal_card = deal_card_start+deal_table;
+                    $( "#deal_info" ).append( $( deal_card ) );
+                    insertInvestors()
+                }
+                else if (deal==0){
+                    var no_deal_card = '<tr><td class="left-col">no deal</td><td><span class="glyphicon glyphicon-remove"></span></td></tr></tbody></table></div>';
+                    var deal_card = deal_card_start+no_deal_card
+                    $( "#deal_info" ).append( $( deal_card ) );
+                }
+            }
+
+            function insertCallCard() {
+                var call_card_start = '<div class="card"><div class="small-title"><strong>Help Sharkalytics expand its <i>Shark Tank</i> knowledge base!</strong></div> '
+                if (deal==1) {
+                    var mid_of_call_card = '<div class="card-text"><p>Did this <i>Shark Tank</i> investment come through? Is {{ name }} still in operation? '
+                }
+                else if (deal==0) {
+                    var mid_of_call_card = '<div class="card-text"><p>Is {{ name }} still in operation? '
+                }
+                var call_card_end = '<a href="#disqus_thread"><strong>Tell us in the comments.</strong></a></p></div></div>'
+                var call_card = call_card_start+mid_of_call_card+call_card_end
+                $( "#info_card" ).before( $( call_card ) )
+            }
+
+            function insertProductLinks() {
+                if (buyit==1){
+                    var amazon = '{{ amazon }}';
+                    var url = "'{{ amazon }}'";
+                    var product = "'{{ name }}'";
+                    var product_table = '<div class="card"><span class="small-title"><b>buy from</b></span><table class="table"><tbody id="products"><tr><td><a id="amzn_link" href="'+amazon+'" onclick="trackAMZNLink('+product+', '+url+'); return true;" target="_blank" rel="nofollow">amazon.com</a></td></tr></tbody></table></div>';
+                    $( "#ecommerce" ).append( $( product_table ) );
+                }
+            }
+
+        </script>
+        <script type="text/javascript" src='/static/js/company.js'></script>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                var url = location.href;
+                var start = url.indexOf("/company/")+9;
+                var COID = url.slice(start);
+                var disqus_shortname = 'sharkalytics'; 
+                var disqus_identifier = COID;
+                var disqus_title = 'sharkalytics: {{ name }}';
+            // DON'T EDIT BELOW THIS LINE
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    {% endblock %}

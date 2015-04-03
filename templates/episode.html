@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: episode</title>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+            <span class="card-title">
+                Season {{ season }} Episode {{ epnumber }}
+            </span>
+        </div>
+
+        <div class="card">
+            <span class="small-title"><b>highlights</b></span>
+            <table class="table"><tbody><tr><td>{{ total_deal_dollars }} dollars invested in {{ deal_count }} deals</td></tr></tbody></table>
+        </div>
+
+        <div class="card">
+            <span class="small-title">
+                <b>sharks participating</b>
+            </span>
+            <table class="table">
+                <tbody>
+                    {% for SID, name in sharks_in_ep.iteritems() %}
+                        {% set link='/investor/' ~ SID %}
+                        <tr>
+                            <td class="narrow-col"><a href={{ link }} class="btn btn-default btn-circle"><b>{{ initials[SID] }}</b></a></td>
+                            <td style="vertical-align: middle;"><a href={{ link }}>{{ name }}</a></td>
+                        </tr>
+                    {% endfor%}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <span class="small-title"><b>companies pitching</b></span>
+            <div class="card-text">
+                Sign in to view the full company directory. You can quickly and easily log in with Google by visiting <a href="http://access.sharkalytics.com">access.sharkalytics.com</a>. 
+            </div>
+        </div>
+
+    {% endblock %}

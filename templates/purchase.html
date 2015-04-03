@@ -1,0 +1,114 @@
+
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: sign up</title>
+        <style type="text/css">
+          html,body {
+          height:100%;
+          }
+
+          h1 {
+            font-family: Arial,sans-serif
+            font-size:80px;
+            color:#0B7DB2;
+          }
+
+          .lead {
+            color:#0B7DB2;
+          }
+
+          /* Custom container */
+          .container-full {
+            margin: 0 auto;
+            width: 100%;
+            min-height:100%;
+            background-color:#C6E8F6;
+            color:#eee;
+            overflow:hidden;
+          }
+
+          .container-full a {
+            color:#0B7DB2;
+            text-decoration:none;
+          }
+
+          .v-center {
+            margin-top:7%;
+          }
+
+          .alert {
+            display: none;
+          }
+        </style>
+    {% endblock%}
+
+    {% block body %}
+    <div class="container-full">
+
+      <div class="row">
+       
+        <div class="col-lg-12 text-center v-center">
+          
+          <h1>Well, hello there. </h1>
+          <p class="lead">You look like someone who might want access to Sharkalytics for <strong>commercial use</strong>.</p>
+          <p style="color: black;">Our carefully selected and arranged data may be licensed for a fee.</p>
+          <p style="color: black;">Request a quote for a commercial license below.</p>
+          
+          <div id="confirm_div"></div>
+          <br>
+          <form role="form" class="col-lg-12">
+            <div class="input-group" style="width:340px;text-align:center;margin:0 auto;">
+              <input class="form-control input-lg" id="user_email" title="Sharkalytics reserves the right of admission." placeholder="Enter your email address" type="email">
+              <span class="input-group-btn"><button class="btn btn-lg btn-primary" type="button" onclick="submitEmail();">OK</button></span>
+            </div>
+          </form>
+        </div>
+      </div> <!-- /row -->
+      <br><br><br><br>
+</div> <!-- /container full -->
+<br>
+
+        <!-- jQuery submit code (empty for now)  -->
+        
+        <script type='text/javascript'>
+          function showSuccess(){
+            var this_page = location.href;
+            var arg = this_page.indexOf("?");
+            if (arg==-1){
+              console.log('')
+            }
+            else {
+              var this_page = this_page.slice(0,arg)
+            }
+            var req = this_page+'?submit=1'
+            window.open(req, "_self");
+          }
+
+          function submitEmail(){
+            var email = $( '#user_email' ).val();
+            $.post("/submituseremail",
+            {
+              email:email,
+            },
+            showSuccess
+            );
+          }
+
+          function insertSubmitConfirm(submit){
+            if (submit==1){
+              var confirmText = "<div class='alert alert-success' role='alert' id='confirm'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button><strong>Success!</strong> Your email has been entered.</div>"
+              $( "#confirm_div" ).append(confirmText)    
+              $('#confirm' ).appendTo('#confirm_div').slideDown('slow');
+            }
+            else if (submit==0){
+                console.log('')
+            }
+            else {
+                console.log('')
+            }
+          }
+          
+          $( document ).ready( insertSubmitConfirm({{ submit }}) );
+
+        </script>
+    {% endblock %}

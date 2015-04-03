@@ -1,0 +1,43 @@
+#######################################################
+# Robots Exclusion Protocol file for sharkalytics.com #
+#######################################################
+# v2
+# Reference (de-facto protocol) 
+# http://www.robotstxt.org/norobots-rfc.txt
+
+# Allows vetted bots
+User-agent: Applebot
+User-agent: Googlebot
+User-agent: GoogleBot-Mobile
+User-agent: GoogleBot-Image
+User-agent: Mediapartners-Google 
+User-agent: Adsbot-Google
+User-agent: Bingbot 
+User-agent: bingbot 
+User-agent: Disqus 
+User-agent: DuckDuckBot 
+User-agent: FlipboardProxy # http://flipboard.com/browserproxy 
+User-agent: Slurp #yahoo.com
+User-agent: facebookexternalhit
+User-agent: LinkedInBot 
+User-agent: ia_archiver #archive.org
+User-agent: archive.org_bot # Wayback Machine Live Record
+User-agent: Twitterbot
+User-agent: YandexBot
+User-agent: redditbot
+Allow: / 
+
+# Disallows all other bots
+User-agent: adbeat_bot 
+User-agent: meanpathbot 
+User-agent: DotBot # moz analytics
+User-agent: robertbot # moz analytics
+User-agent: MixrankBot
+User-agent: Baiduspider
+User-agent: SMTBot
+User-agent: *
+Disallow: /
+
+# Enforces 5 second delay on all bots between successive requests
+User-agent: *
+Crawl-delay: 5

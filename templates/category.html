@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: category</title>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+            <div class="card-title">{{ category }}</div>
+        </div>
+
+        {% for COID, name in companies.iteritems() %}
+            {% set link='/company/'~COID %}
+            <div class="card">
+                <div class="card-title"><a href={{ link }}>{{ name }}</a></div>
+                <div class="small-title"><span>{{ descriptions[COID] }}</span><span><a href={{ link }}> Learn more.</a></span></div>
+            </div>
+        {% endfor %}
+
+    {% endblock %}

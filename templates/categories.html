@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: Shark Tank company categories</title>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+            <div class="card-title">Shark Tank company categories</div>
+        </div>
+
+        {% for cid, name in cat_dict.iteritems() %}
+            {% set link = '/category/' ~ cid %}
+
+            <div class="card">
+                <div class="card-title"><a href={{ link }}>{{ name }}</a></div>
+                    <div class="small-title">
+                        {% for company in ord_companies[cid] %}
+                            {% set entry = company ~ '  ' %}
+                                <span style="padding-right: 1em;">{{ entry }}</span>
+                        {% endfor %}
+                        <a href={{ link }}><b>See all</b></a>
+                    </div>
+            </div>
+        {% endfor %}
+    
+    {% endblock %}

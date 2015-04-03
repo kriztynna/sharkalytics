@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+  {% block head %}
+    <title>sharkalytics: group deals</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <style>
+      /* included styling*/
+      #treemap {
+        width: auto;
+        height: 500px;
+        background: #ddd;
+      }
+
+      text {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 85%;
+        font-weight: 300;
+        color: #333; /* same as body */
+      }
+
+      text:hover {
+        font-weight: 700;
+      }
+
+      .grandparent text {
+        font-weight: bold;
+        color: #F5F9FC;
+      }
+
+      rect {
+        fill: none;
+        stroke: #fff;
+      }
+
+      rect.parent,
+      .grandparent rect {
+        stroke-width: 2px;
+      }
+
+      .grandparent rect {
+        fill: #0B7DB2;
+      }
+
+      .grandparent:hover rect {
+        fill: #006DA2;
+      }
+
+      .children rect.parent,
+      .grandparent rect {
+        cursor: pointer;
+      }
+
+      .children rect.parent {
+        fill: #bbb;
+        fill-opacity: .5;
+      }
+
+      .children:hover rect.child {
+        fill: #bbb;
+      }
+
+      #funded {
+        fill: purple;
+        fill-opacity: .5;
+      }
+
+      #funded:hover {
+        fill: blue;
+      }
+
+      #not-funded {
+        fill: orange;
+        fill-opacity: .5;
+      }
+
+      #not-funded:hover {
+        fill: red;
+      }
+
+      /* my own styling */
+      div#treemap {
+        word-wrap: break-word;
+        line-height: 1.1;
+      }
+      a:hover {
+        text-decoration: none;
+      }
+
+      .d3-tip {
+        line-height: 1;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 700;
+        font-size: 85%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+      }
+
+      /* Creates a small triangle extender for the tooltip */
+      .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 85%;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+      }
+
+      /* Style northward tooltips differently */
+      .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+      }
+    </style>
+    <!-- og meta tags -->
+    <meta property="og:title" content="A visualization of every group deal on Shark Tank" />
+    <meta property="og:description" content="For all their competitive antics, the sharks sure buddy-up on a lot of deals. See who likes to team up, and who their favorite partners appear to be." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="http://www.sharkalytics.com/static/images/groupdealsviz.png" />
+  {% endblock%}
+
+  {% block body %}
+    <div class="card top-card">
+      <span class="card-title">Shark Tank investment treemap</span>
+    </div>
+
+    <div class="card">
+      <div class="card-text">
+        <p>
+          wake up in the morning feeling like p diddy
+        </p>
+        <p>
+          Got my jacket I'm out the door I'm out to hit this city <strong>Click</strong> to see the list of companies that this pair sharks has invested in together and how much they invested.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="small-title"><b>Before I leave brush my teeth with a bottle of Jack</b></span>
+      <div id="treemap"></div>
+    </div>
+
+    <div class="card" id="note">
+      <span class="small-title"></span>
+      <div class="card-text">
+        <p>
+          This visualization was created on February 24, 2015. It is current as of {{ last_ep_date }}, when episode {{ epnumber }} of season {{ season }} aired.
+        </p>
+      </div>
+    </div>
+
+    <div id="disqus_thread"></div>
+
+    <!--
+    <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+          var url = location.href;
+          var disqus_shortname = 'sharkalytics'; 
+          var disqus_identifier = 'sharkalytics group deals heatmap';
+          var disqus_title = 'Sharkalytics: Shark Tank group deals heatmap';
+      // DON'T EDIT BELOW THIS LINE
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    -->
+
+    <script type="text/javascript">
+      var margin = {top: 20, right: 0, bottom: 0, left: 0},
+          width = parseInt(d3.select('#treemap').style('width'), 10),
+          height = 500 - margin.top - margin.bottom,
+          formatNumber = d3.format(",d"),
+          transitioning;
+
+      var x = d3.scale.linear()
+          .domain([0, width])
+          .range([0, width]);
+
+      var y = d3.scale.linear()
+          .domain([0, height])
+          .range([0, height]);
+
+      var treemap = d3.layout.treemap()
+          .children(function(d, depth) { return depth ? null : d._children; })
+          .sort(function(a, b) { return a.value - b.value; })
+          .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
+          .round(false);
+
+      var svg = d3.select("#treemap").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.bottom + margin.top)
+          .style("margin-left", -margin.left + "px")
+          .style("margin.right", -margin.right + "px")
+        .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+          .style("shape-rendering", "crispEdges");
+
+      var grandparent = svg.append("g")
+          .attr("class", "grandparent");
+
+      grandparent.append("rect")
+          .attr("y", -margin.top)
+          .attr("width", width)
+          .attr("height", margin.top);
+
+      grandparent.append("text")
+          .attr("x", 6)
+          .attr("y", 6 - margin.top)
+          .attr("dy", ".75em");
+
+      d3.json("/chartdata/treemap", function(root) {
+        initialize(root);
+        accumulate(root);
+        layout(root);
+        display(root);
+
+        function initialize(root) {
+          root.x = root.y = 0;
+          root.dx = width;
+          root.dy = height;
+          root.depth = 0;
+        }
+
+        // Aggregate the values for internal nodes. This is normally done by the
+        // treemap layout, but not here because of our custom implementation.
+        // We also take a snapshot of the original children (_children) to avoid
+        // the children being overwritten when when layout is computed.
+        function accumulate(d) {
+          return (d._children = d.children)
+              ? d.value = d.children.reduce(function(p, v) { return p + accumulate(v); }, 0)
+              : d.value;
+        }
+
+        // Compute the treemap layout recursively such that each group of siblings
+        // uses the same size (1×1) rather than the dimensions of the parent cell.
+        // This optimizes the layout for the current zoom state. Note that a wrapper
+        // object is created for the parent node for each group of siblings so that
+        // the parent’s dimensions are not discarded as we recurse. Since each group
+        // of sibling was laid out in 1×1, we must rescale to fit using absolute
+        // coordinates. This lets us use a viewport to zoom.
+        function layout(d) {
+          if (d._children) {
+            treemap.nodes({_children: d._children});
+            d._children.forEach(function(c) {
+              c.x = d.x + c.x * d.dx;
+              c.y = d.y + c.y * d.dy;
+              c.dx *= d.dx;
+              c.dy *= d.dy;
+              c.parent = d;
+              layout(c);
+            });
+          }
+        }
+
+        function display(d) {
+          grandparent
+              .datum(d.parent)
+              .on("click", transition)
+            .select("text")
+              .text(name(d));
+
+          var g1 = svg.insert("g", ".grandparent")
+              .datum(d)
+              .attr("class", "depth");
+
+          var g = g1.selectAll("g")
+              .data(d._children)
+            .enter().append("g");
+
+          g.filter(function(d) { return d._children; })
+              .classed("children", true)
+              .on("click", transition);
+
+          g.selectAll(".child")
+              .data(function(d) { return d._children || [d]; })
+            .enter().append("rect")
+              .attr("class", "child")
+              .attr("id", function(d) { return assignColor(d); })
+              .call(rect);
+
+          g.append("rect")
+              .attr("class", "parent")
+              .attr("id", function(d) { return assignColor(d); })
+              .call(rect)
+            .append("title")
+              .text(function(d) { return formatNumber(d.value); });
+
+          g.append("a")
+             .attr("xlink:href", function(d) { return link(d); })
+             .attr("xlink:show", "new")
+             .attr("dy", ".75em")
+             .attr("dx", ".75em")
+           .append("foreignObject")
+             .call(foreignObject)
+            .append("xhtml:div")
+            .append("text") 
+             .text( function(d) { return d.name; })
+             
+
+          function transition(d) {
+            // Update the domain only after entering new elements.
+            console.log("updating domain...");
+            x.domain([d.x, d.x + d.dx]);
+            y.domain([d.y, d.y + d.dy]);
+            console.log("done updating domain...");
+
+            if (transitioning || !d) return;
+            transitioning = true;
+
+            var g2 = display(d),
+                t1 = g1.transition().duration(750),
+                t2 = g2.transition().duration(750);
+
+
+            // Enable anti-aliasing during the transition.
+            svg.style("shape-rendering", null);
+
+            // Draw child nodes on top of parent nodes.
+            svg.selectAll(".depth").sort(function(a, b) { return a.depth - b.depth; });
+
+            // Fade-in entering text.
+            g2.selectAll("foreignObject").style("fill-opacity", 0);
+
+            // Transition to the new view.
+            t1.selectAll("rect").call(rect);
+            t2.selectAll("rect").call(rect);
+            // t1.selectAll("text").call(text).style("fill-opacity", 0);
+            // t2.selectAll("text").call(text).style("fill-opacity", 1);
+            t1.selectAll("foreignObject").call(foreignObject);
+            t2.selectAll("foreignObject").call(foreignObject);
+
+            // Remove the old node when the transition is finished.
+            t1.remove().each("end", function() {
+              svg.style("shape-rendering", "crispEdges");
+              transitioning = false;
+            });
+          }
+
+          return g;
+        }
+
+        function text(text) {
+          text.attr("x", function(d) { return x(d.x) + 6; })
+              .attr("y", function(d) { return y(d.y) + 6; });
+        }
+
+        function rect(rect) {
+          rect.attr("x", function(d) { if (d.name == "Liddup") { console.log("RECT: x(" + d.x + ") = " + x(d.x) + "," + y(d.y)); console.log(d); } return x(d.x); })
+              .attr("y", function(d) { return y(d.y); })
+              .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
+              .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+        }
+
+        function foreignObject(foreignObject) {
+          foreignObject.attr("x", function(d) { if (d.name == "Liddup") { console.log("FO: x(" + d.x + ") = " + x(d.x) + "," + y(d.y)); console.log(d); } return x(d.x)+4; })
+              .attr("y", function(d) { return y(d.y)+3; })
+              .attr("width", function(d) { return x(d.x + d.dx) - x(d.x)-5; })
+              .attr("height", function(d) { return y(d.y + d.dy) - y(d.y)-4; });
+        }
+
+        function name(d) {
+          return d.parent
+              ? name(d.parent) + "." + d.name
+              : d.name;
+        }
+
+        function link(d) {
+          if (d.SID) {
+            var link = '/investor/'+d.SID;
+          }
+          else if (d.COID) {
+            var link = '/company/'+d.COID;
+          }
+          else {
+            var link = '';
+            console.log('this object does not contain a link')
+          }
+          return link
+        }
+
+        function assignColor(d) { 
+          if (d.funded!=undefined) {
+            console.log(d.funded);
+            switch(d.funded) {
+              case 0:
+                id = "not-funded";
+                break;
+              case 1:
+                id = "funded";
+                break;
+              default:
+                id = "incomplete"
+            } 
+            console.log(d.name+': '+id)
+            return id;
+          }  
+        }
+
+        function getRectWidth(d) { 
+          if (d.SID) { 
+            return '';
+          } 
+          else if (d.COID) {
+            var ID="#"+d.COID;
+          } 
+          else {
+            var ID="#";
+            console.log("oops")
+          }
+          var rectWidth = d3.select(ID).node().getBBox().width;
+          return rectWidth
+        }
+
+      });
+
+      </script>
+
+
+
+  {% endblock %}

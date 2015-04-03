@@ -1,0 +1,7 @@
+*.pyc
+.database.swp
+.DS_Store
+index.yaml
+*.idea
+dos.yaml
+privatevariables.py

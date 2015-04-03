@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>add episode</title>
+        <style>
+        .alert {
+            display: none;
+        }
+        </style>
+    {% endblock%}
+
+    {% block body %}
+    <h2>add episode</h2>
+
+    <form class="form-inline" role="form" action="addepisode" method="post">
+
+        <div class="form-group" name="epinfo">
+            <label for="epinfo">Episode info</label>
+            <input type="number" class="form-control" name="season" placeholder="season">
+            <input type="number" class="form-control" name="epnumber" placeholder="episode number">
+            <input type="text" class="form-control" name="airdate" placeholder="yyyy-mm-dd">
+        </div>
+
+        <div class="form-group" name="sharks">
+            <label for="sharks">Cast</label>
+            <label for="koleary"><input type="checkbox" class="form-control" name="koleary" value="koleary">Kevin O'Leary</label>
+            <label for="mcuban"><input type="checkbox" class="form-control" name="mcuban" value="mcuban">Mark Cuban</label>
+            <label for="lgreiner"><input type="checkbox" class="form-control" name="lgreiner" value="lgreiner">Lori Greiner</label>
+            <label for="bcorcoran"><input type="checkbox" class="form-control" name="bcorcoran" value="bcorcoran">Barbara Corcoran</label>
+            <label for="rherjavec"><input type="checkbox" class="form-control" name="rherjavec" value="rherjavec">Robert Herjavec</label>
+            <label for="djohn"><input type="checkbox" class="form-control" name="djohn" value="djohn">Daymond John</label>
+            <label for="nwoodman"><input type="checkbox" class="form-control" name="nwoodman" value="nwoodman">Nick Woodman</label>
+            <label for="jpdejoria"><input type="checkbox" class="form-control" name="jpdejoria" value="jpdejoria">John Paul DeJoria</label>
+            <label for="stisch"><input type="checkbox" class="form-control" name="stisch" value="stisch">Steve Tisch</label>
+            <label for="kharrington"><input type="checkbox" class="form-control" name="kharrington" value="kharrington">Kevin Harrington</label>
+            <label for="jfoxworthy"><input type="checkbox" class="form-control" name="jfoxworthy" value="jfoxworthy">Jeff Foxworthy</label>
+        </div>
+
+        <br><br>
+        <div><h4><label for="company1">Company 1</label></h4></div>
+        <div class="form-group" name="company1">
+            <input type="text" class="form-control" name="name1" placeholder="company name">
+            <input type="text" class="form-control" name="cat1" placeholder="category">
+            <input type="text" class="form-control" name="description1" placeholder="description">
+            <input type="text" class="form-control" name="people1" placeholder="people">
+            <input type="text" class="form-control" name="website1" placeholder="website">
+        </div>
+
+        <br><br>
+        <div><label for="pitch1">Pitch 1</label></div>
+        <div class="form-group" name="pitch1">
+            <input type="number" class="form-control" name="ask_usd1" placeholder="$USD sought">
+            <input type="text" class="form-control" name="ask_pct1" placeholder="pct equity stake offered">
+            <input type="text" class="form-control" name="special1" placeholder="special terms">
+            <label for="deal"><input type="checkbox" class="form-control" name="dealcheck1" value="1">Deal?</label>
+        </div>
+
+        <br><br>
+        <div><label for="deal1">Deal 1</label></div>
+        <div class="form-group" name="deal1">    
+            <input type="number" class="form-control" name="deal_usd1" placeholder="$USD received">
+            <input type="text" class="form-control" name="deal_pct1" placeholder="pct equity stake given">
+            <input type="text" class="form-control" name="dealspecial1" placeholder="special terms, contingencies, royalties">
+        </div>
+        
+        <br><br>
+        <div><label for="investors1">$USD split by shark</label></div>
+        <div class="form-group" name="investors1">
+            <input type="number" class="form-control" name="kolearydeal1" placeholder="kevin">
+            <input type="number" class="form-control" name="rherjavecdeal1" placeholder="robert">
+            <input type="number" class="form-control" name="mcubandeal1" placeholder="mark">
+            <input type="number" class="form-control" name="lgreinerdeal1" placeholder="lori">
+            <input type="number" class="form-control" name="bcorcorandeal1" placeholder="barbara">
+            <input type="number" class="form-control" name="djohndeal1" placeholder="daymond">
+            <input type="number" class="form-control" name="nwoodmandeal1" placeholder="nick">
+            <input type="number" class="form-control" name="jpdejoriadeal1" placeholder="john paul">
+            <input type="number" class="form-control" name="stischdeal1" placeholder="steve tisch">
+            <input type="number" class="form-control" name="kharringtondeal1" placeholder="kevin harrington">
+            <input type="number" class="form-control" name="jfoxworthydeal1" placeholder="jeff foxworthy">
+        </div>
+
+        <br><br>
+        <div><h4><label for="company2">Company 2</label></h4></div>
+        <div class="form-group" name="company2">
+            <input type="text" class="form-control" name="name2" placeholder="company name">
+            <input type="text" class="form-control" name="cat2" placeholder="category">
+            <input type="text" class="form-control" name="description2" placeholder="description">
+            <input type="text" class="form-control" name="people2" placeholder="people">
+            <input type="text" class="form-control" name="website2" placeholder="website">
+        </div>
+
+        <br><br>
+        <div><label for="pitch2">Pitch 2</label></div>
+        <div class="form-group" name="pitch2">
+            <input type="number" class="form-control" name="ask_usd2" placeholder="$USD sought">
+            <input type="text" class="form-control" name="ask_pct2" placeholder="pct equity stake offered">
+            <input type="text" class="form-control" name="special2" placeholder="special terms">
+            <label for="deal"><input type="checkbox" class="form-control" name="dealcheck2" value="1">Deal?</label>
+        </div>
+
+        <br><br>
+        <div><label for="deal2">Deal 2</label></div>
+        <div class="form-group" name="deal2">    
+            <input type="number" class="form-control" name="deal_usd2" placeholder="$USD received">
+            <input type="text" class="form-control" name="deal_pct2" placeholder="pct equity stake given">
+            <input type="text" class="form-control" name="dealspecial2" placeholder="special terms, contingencies, royalties">
+        </div>
+        
+        <br><br>
+        <div><label for="investors2">$USD split by shark</label></div>
+        <div class="form-group" name="investors2">
+            <input type="number" class="form-control" name="kolearydeal2" placeholder="kevin">
+            <input type="number" class="form-control" name="rherjavecdeal2" placeholder="robert">
+            <input type="number" class="form-control" name="mcubandeal2" placeholder="mark">
+            <input type="number" class="form-control" name="lgreinerdeal2" placeholder="lori">
+            <input type="number" class="form-control" name="bcorcorandeal2" placeholder="barbara">
+            <input type="number" class="form-control" name="djohndeal2" placeholder="daymond">
+            <input type="number" class="form-control" name="nwoodmandeal2" placeholder="nick">
+            <input type="number" class="form-control" name="jpdejoriadeal2" placeholder="john paul">
+            <input type="number" class="form-control" name="stischdeal2" placeholder="steve tisch">
+            <input type="number" class="form-control" name="kharringtondeal2" placeholder="kevin harrington">
+            <input type="number" class="form-control" name="jfoxworthydeal2" placeholder="jeff foxworthy">
+        </div>
+
+        <br><br>
+        <div><h4><label for="company3">Company 3</label></h4></div>
+        <div class="form-group" name="company3">
+            <input type="text" class="form-control" name="name3" placeholder="company name">
+            <input type="text" class="form-control" name="cat3" placeholder="category">
+            <input type="text" class="form-control" name="description3" placeholder="description">
+            <input type="text" class="form-control" name="people3" placeholder="people">
+            <input type="text" class="form-control" name="website3" placeholder="website">
+        </div>
+
+        <br><br>
+        <div><label for="pitch3">Pitch 3</label></div>
+        <div class="form-group" name="pitch3">
+            <input type="number" class="form-control" name="ask_usd3" placeholder="$USD sought">
+            <input type="text" class="form-control" name="ask_pct3" placeholder="pct equity stake offered">
+            <input type="text" class="form-control" name="special3" placeholder="special terms">
+            <label for="deal"><input type="checkbox" class="form-control" name="dealcheck3" value="1">Deal?</label>
+        </div>
+
+        <br><br>
+        <div><label for="deal3">Deal 3</label></div>
+        <div class="form-group" name="deal3">    
+            <input type="number" class="form-control" name="deal_usd3" placeholder="$USD received">
+            <input type="text" class="form-control" name="deal_pct3" placeholder="pct equity stake given">
+            <input type="text" class="form-control" name="dealspecial3" placeholder="special terms, contingencies, royalties">
+        </div>
+        
+        <br><br>
+        <div><label for="investors3">$USD split by shark</label></div>
+        <div class="form-group" name="investors3">
+            <input type="number" class="form-control" name="kolearydeal3" placeholder="kevin">
+            <input type="number" class="form-control" name="rherjavecdeal3" placeholder="robert">
+            <input type="number" class="form-control" name="mcubandeal3" placeholder="mark">
+            <input type="number" class="form-control" name="lgreinerdeal3" placeholder="lori">
+            <input type="number" class="form-control" name="bcorcorandeal3" placeholder="barbara">
+            <input type="number" class="form-control" name="djohndeal3" placeholder="daymond">
+            <input type="number" class="form-control" name="nwoodmandeal3" placeholder="nick">
+            <input type="number" class="form-control" name="jpdejoriadeal3" placeholder="john paul">
+            <input type="number" class="form-control" name="stischdeal3" placeholder="steve tisch">
+            <input type="number" class="form-control" name="kharringtondeal3" placeholder="kevin harrington">
+            <input type="number" class="form-control" name="jfoxworthydeal3" placeholder="jeff foxworthy">
+        </div>
+
+        <br><br>
+        <div><h4><label for="company4">Company 4</label></h4></div>
+        <div class="form-group" name="company4">
+            <input type="text" class="form-control" name="name4" placeholder="company name">
+            <input type="text" class="form-control" name="cat4" placeholder="category">
+            <input type="text" class="form-control" name="description4" placeholder="description">
+            <input type="text" class="form-control" name="people4" placeholder="people">
+            <input type="text" class="form-control" name="website4" placeholder="website">
+        </div>
+
+        <br><br>
+        <div><label for="pitch4">Pitch 4</label></div>
+        <div class="form-group" name="pitch4">
+            <input type="number" class="form-control" name="ask_usd4" placeholder="$USD sought">
+            <input type="text" class="form-control" name="ask_pct4" placeholder="pct equity stake offered">
+            <input type="text" class="form-control" name="special4" placeholder="special terms">
+            <label for="deal"><input type="checkbox" class="form-control" name="dealcheck4" value="1">Deal?</label>
+        </div>
+
+        <br><br>
+        <div><label for="deal4">Deal 4</label></div>
+        <div class="form-group" name="deal4">    
+            <input type="number" class="form-control" name="deal_usd4" placeholder="$USD received">
+            <input type="text" class="form-control" name="deal_pct4" placeholder="pct equity stake given">
+            <input type="text" class="form-control" name="dealspecial4" placeholder="special terms, contingencies, royalties">
+        </div>
+        
+        <br><br>
+        <div><label for="investors4">$USD split by shark</label></div>
+        <div class="form-group" name="investors4">
+            <input type="number" class="form-control" name="kolearydeal4" placeholder="kevin">
+            <input type="number" class="form-control" name="rherjavecdeal4" placeholder="robert">
+            <input type="number" class="form-control" name="mcubandeal4" placeholder="mark">
+            <input type="number" class="form-control" name="lgreinerdeal4" placeholder="lori">
+            <input type="number" class="form-control" name="bcorcorandeal4" placeholder="barbara">
+            <input type="number" class="form-control" name="djohndeal4" placeholder="daymond">
+            <input type="number" class="form-control" name="nwoodmandeal4" placeholder="nick">
+            <input type="number" class="form-control" name="jpdejoriadeal4" placeholder="john paul">
+            <input type="number" class="form-control" name="stischdeal4" placeholder="steve tisch">
+            <input type="number" class="form-control" name="kharringtondeal4" placeholder="kevin harrington">
+            <input type="number" class="form-control" name="jfoxworthydeal4" placeholder="jeff foxworthy">
+        </div>
+
+        <br><br>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+    <br>
+    {% endblock %}

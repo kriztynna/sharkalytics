@@ -1,0 +1,40 @@
+application: shark-base # for new deployments, you'll need to pick a new name
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: no
+
+libraries:
+- name: webapp2
+  version: "2.5.1"
+- name: jinja2
+  version: latest
+- name: markupsafe
+  version: latest
+- name: MySQLdb
+  version: "latest"
+
+builtins:
+- deferred: on
+
+inbound_services:
+- mail
+
+handlers:
+- url: /static/csv/(.*\.csv)
+  mime_type: text/csv
+  static_dir: static/csv
+- url: /static/tsv/(.*\.tsv)
+  static_dir: static/tsv
+- url: /static/images
+  static_dir: static/images
+- url: /static
+  static_dir: static
+- url: /robots.txt
+  static_files: static/media/robots.txt
+  upload: static/media/robots.txt
+- url: /admin/.*
+  script: sharkalytics.app
+  login: admin  
+- url: /.*
+  script: sharkalytics.app

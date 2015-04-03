@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics</title>
+        <style>
+        .jumbotron{
+            background-color: #F5F9FC;
+        }
+        </style>
+    {% endblock%}
+
+    {% block body %}
+    <div class="card top-card">
+        <div class="card-title">About Sharkalytics</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">The basics</div>
+        <div class="card-text">
+            <p>
+                Sharkalytics started out as a project to quantify the investment activity on ABC's <i>Shark Tank</i>. Unsatisfied by existing episode recap options that often misreported deal terms or omitted mention of the outcomes entirely, I set out to create a trustworthy reference guide for the true <i>Shark Tank</i> fan.
+            </p>
+            <p>
+                The project has evolved to include aggregate data on each of the <a href="/sharks" target="_blank">sharks</a>, interactive <a href="/visualizations" target="_blank">visualizations</a>, and <a href="#crowdsource">crowdsourced data collection</a> efforts. 
+            </p>
+            <p>
+                My name is Cristina. I am the curator, developer, and owner of Sharkalytics. You can reach me at <a href="mailto:cristina@sharkalytics.com">cristina@sharkalytics.com</a>.
+            </p>
+            <p>
+                Don't forget to follow <a href="http://www.twitter.com/sharkalytics">@sharkalytics</a> for updates to our site content!
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">The data</div>
+        <div class="card-text">
+            <p>Sharkalytics is the only Shark Tank reference guide that can attest to faithfully collecting the data for each pitch and each deal from the primary source: watching episodes of the show. That's right, {{ total_minutes }} minutes of screen time so far.</p>
+            <p>If Sharkalytics already sourced and double-checked the data, why should you duplicate the effort? No need, just use this site as a reference guide. It's free, and I only ask that you cite Sharkalytics as the source and include a link back. Please refer to our super short <a href="#terms">terms and conditions</a> and <a href="mailto:cristina@sharkalytics.com">write</a> with any questions.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title" id="crowdsource">Help Sharkalytics get more smarts!</div>
+        <div class="card-text">
+            <p>
+                Sharkalytics started out as a simple project to improve the transparency behind <i>Shark Tank</i> outcomes. It's already gone a long way on its own to collect and organize the data from every company's pitch on the show. But what comes next?
+            </p>
+            <p>
+                Deals <a href="/company/how-do-you-roll#disqus_thread">fall through</a>. Funded companies can <a href="/company/i-want-to-draw-a-cat-for-you#disqus_thread">still shutter</a>, even after some success. Every once in a while, an investment gets bought out for an even bigger sum. Meanwhile, many others that didn't get a shark onboard are <a href="/company/cheekd#disqus_thread">still kicking</a>.
+            </p>
+            <p>
+                Much of this information is out there on the web, but it's a lot for this one-woman show to track on her own. If you like Sharkalytics and feel inclined to give back, here are some of the dimensions we're looking to add to the database:
+            </p>
+            <ul>
+                <li>Which deals closed? Which fell through? Examples: <a href="/company/cousins-maine-lobster#disqus_thread">Cousins Maine Lobster</a>, <a href="/company/how-do-you-roll#disqus_thread">How Do You Roll?</a></li>
+                <li>Do the shark investors still own their stake in the company? If not, who owns it now? Example: <a href="/company/groovebook#disqus_thread">Groovebook</a></li>
+                <li>Is this company still in operation? Did it ever even launch? Examples: <a href="/company/misomedia#disqus_thread">MisoMedia</a>, <a href="/company/turbobaster#disqus_thread">Turbobaster</a></li>
+            </ul>
+            <p>
+                To contribute, just leave a comment on the relevant company's page, as shown in these examples above. 
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title" id="terms">Terms and conditions</div>
+        <div class="card-text">
+            <p>
+                Sharkalytics <i>Shark Tank</i> data is open for all to see, but if you are using it for a project of your own, please cite Sharkalytics as the source and include a link back. Seems fair, right?
+            </p>
+            <p>
+                Sharkalytics reserves the right to rate-limit and restrict access to any user for any reason. Some examples of unwelcome visitors include most bots, all spammers, and a small number of overzealous humans. 
+            </p>
+        </div>
+    </div>
+
+    {% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: companies</title>
+        <style type="text/css">
+            text.bubble_names {
+                font-family: 'Open Sans', sans-serif;
+                font-size: 85%;
+                font-weight: 300;
+            }
+            
+            text.bubble_names:hover {
+                font-weight: 700;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+
+        </style>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card"><span class="card-title">Companies appearing on Shark Tank</span></div>
+        
+        <div class="card">
+            <span class="small-title"><b>summary stats</b></span>
+            <table class="table table-condensed">
+                <tbody>
+                    <tr>
+                        <td>total pitches by companies</td>
+                        <td>{{ total_pitches }}</td>
+                    </tr>
+                    <tr>
+                        <td>success rate</td>
+                        <td>{{ total_deals }} of companies get an investment on air, a {{ total_pct_success }} success rate</td>
+                    </tr>
+                    <tr>
+                        <td>funding</td>
+                        <td>
+                        {{ total_deal_usd }} invested in total, on average {{ avg_delta_usd }} {{ more_less_usd }} was being sought
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ownership</td>
+                        <td>
+                        entrepreneurs give up {{ avg_deal_pct }} equity on average, {{ avg_delta_pct }} {{ more_less_pct }} what they initially pitched
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>valuation</td>
+                        <td>
+                        deals made on air imply a valuation of {{ avg_deal_val }} on average, {{ discount }} what the entrepreneurs pitched
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card top-card">
+            <span class="card-title">browse companies by season</span>
+        </div>
+
+        <div class="card">
+            <div class="card-text">
+                Sign in to view the full company directory. You can quickly and easily log in with Google by visiting <a href="http://access.sharkalytics.com">access.sharkalytics.com</a>. 
+            </div>
+        </div>
+
+        
+
+    {% endblock %}
+</html>

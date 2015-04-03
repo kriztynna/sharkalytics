@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+    {% block head %}
+        <!-- og meta tags -->
+        <meta property="og:title" content="Sharkalytics" />
+        <meta property="og:description" content="The destination for Shark Tank fans who care about the numbers as much as the sharks themselves do. We collect and aggregate data from the show to distill valuable lessons for entrepreneurs." />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="http://www.sharkalytics.com/static/images/frontthumb.png" />
+        <title>Sharkalytics</title>
+        <style>
+        .jumbotron{
+            background-color: #F5F9FC;
+        }
+
+        i {
+            text-align:center;
+        }
+        
+        [class^="fa-"], [class*=" fa-"] {
+            display: inline-block;
+            width: 100%;
+        }
+
+        </style>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card">
+            <div class="card-text">
+            <p>
+                Sharkalytics is the destination for <i>Shark Tank</i> fans who care about the numbers as much as the sharks themselves do. We have compiled a wealth of data over the course of the show's run, and we're always looking for new dimensions to add. 
+            </p>
+            <p>
+                <a href="/visualizations"><strong>Explore</strong></a> the visualizations gallery, <a href="/sharks"><strong>browse</strong></a> the shark profiles, and use the <strong>search</strong> box to find information on any company that has been on the show. If you know of any relevant updates, <a href="/company/zipz#disqus_thread"><strong>leave us a comment</strong></a> on that company's page.
+            </p>
+            </div>
+        </div>
+
+        <div class="small-title">Upcoming Episodes</div>
+        <div class="card">
+            <div class="card-title">S6:E24</div>
+            <div class="small-title">Coming April 10, 2015</div>
+            <p class="card-text">
+                The Sharks celebrate 100 episodes with a look back at their favorite memories, plus they reveal why they participate on the show, as well as take part in a cake-cutting ceremony and a champagne toast. Also: a mother and son who are concerned with healthy bowels; a plywood alternative for storm protection; organic mini-popcorn created by siblings from Brooklyn; a dairy-free line of plant-based cheeses; and an update on the Living Christmas Company invested in by Mark Cuban during Season 5.
+            </p>
+        </div>
+
+        <div id="latest">
+            <br><br>
+            <i class="fa fa-circle-o-notch fa-spin fa-5x"></i>
+            <br><br>
+        </div>
+            
+        <!-- JavaScript -->
+        <script type="text/javascript" src='/static/js/front.js'></script>
+
+
+    {% endblock %}

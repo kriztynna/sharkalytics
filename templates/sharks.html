@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: the sharks of Shark Tank</title>
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+            <span class="card-title">The sharks of Shark Tank</span>
+        </div>
+
+            {% for sid, name in names.iteritems() %}
+                {% set link = '/investor/' ~ sid %}
+                <div class="card">
+                    <div class="card-title">
+                        <a href={{ link }} class="btn btn-default btn-circle"><b>{{ initials[sid] }}</b></a>
+                        <a href={{ link }}>{{ name }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+
+    {% endblock %}

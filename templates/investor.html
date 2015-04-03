@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: {{ name }}'s track record on Shark Tank</title>
+        <!-- Google Analytics Events -->
+            <script>
+                // amazon referral is the event category, click is the event action and the url variable in this case becomes the event label
+                var trackAMZNLink = function(product) {
+                   ga('send', 'event', 'amazon referral', 'click', product, {'hitCallback':
+                     function () {
+                     }
+                   });
+                }
+                // in this case the url wouldn't tell us much, so we use the company/product name instead
+            </script>
+        <!-- og meta tags -->
+        <meta property="og:title" content="{{ name }}'s Shark Tank track record" />
+        <meta property="og:description" content="A total of {{ total_deal_dollars }} invested so far. Those deals add up." />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="http://www.sharkalytics.com/static/images/{{SID}}.png" />
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+            <span class="card-title">{{ name }}</span>
+        </div>
+        <div class="card">
+            <div class="card-title">{{ total_deal_dollars }} invested on air</div>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td class="left-col">deal activity</td>
+                        <td>{{ deal_count }} deals across {{ appearances }} episodes of <i>Shark Tank</i></td>
+                    </tr>
+                    <tr>
+                        <td>rate of investment</td>
+                        <td>{{ deals_over_pitches }} of the {{ pitches_heard }} pitches heard in {{ appearances }} episodes received an investment</td>
+                    </tr>
+                    <tr>
+                        <td>largest deal</td>
+                        <td>
+                      {% set company_link = '/company/' ~ COID %}
+                      {% set season_link = '/episodes' %}
+                      {% set episode_link = '/episode/' ~ EPID %}
+                      {{ largest_deal_dollars }} invested in <a href={{ company_link }}>{{ largest_deal_name }}</a> for {{ largest_deal_pct }} of the business in <a href={{ season_link }}>season {{ season }}</a><a href={{ episode_link}}> episode {{ epnumber }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>investment size</td>
+                        <td>{{ avg_inv_size }} average / {{ median_inv_size}} median</td>
+                    </tr>
+                    <tr>
+                        <td>equity stake taken</td>
+                        <td>{{ avg_stake_taken }} average / {{ median_stake }} median</td>
+                    </tr>
+                    <tr>
+                        <td>deal valuation</td>
+                        <td>{{ avg_deal_val }} average / {{ median_deal_val }} median</td>
+                    </tr>
+                    <tr>
+                        <td>discount</td>
+                        <td>{{ median_discount }} below median asking valuation of {{ median_ask_val }}</td>
+                    </tr>
+                    <tr>
+                        <td>group deals</td>
+                        <td>
+                        {{ group_deal_count }} of {{deal_count}} deals ({{ group_deal_pct }} of total) have been in partnership with another shark{{ best_partner_text }}
+                        {% set spacer_comma=', '%}
+                        {% set spacer_and=' and ' %}
+                        {% set period='.' %}
+                        {% for partner in best_partners_list %}
+                            {% set partner_link='/investor/'~partner[0] %}
+                            <a href={{ partner_link }}>{{ partner[1] }}</a> ({{ partner[2] }} deals)
+                            {% if best_partners_list|length==2 and loop.index==1 %}
+                                {{ spacer_and }}
+                            {% elif loop.index<best_partners_list|length %}
+                                {{ spacer_comma }}
+                                {% if loop.index==best_partners_list|length-1 %}
+                                    {{ spacer_and }}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ period }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>non-standard deals</td>
+                        <td>{{ special_deal_count }} of the deals ({{ special_deal_pct }} of total) involved additional terms beyond cash-for-equity (e.g., royalties, contingencies, lines of credit).
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+            {% if books|length>0 %}
+            <div class="card" id="books">
+                <div class="card-title">books</div>
+                <table class="table table-condensed">
+                    <tbody>
+                        {% for b in books %}
+                            <tr>
+                                <td><a href="{{ b['book_link'] }}" onclick="trackAMZNLink( '{{ name }}' ); return true;" target="_blank" rel="nofollow">{{ b['title'] }}</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-title">Shark Tank investment track record</div>
+                <table class="table table-condensed">
+                    <tbody>
+                        <tr>
+                            <td><b>name</b></td>
+                            <td><b>dollars invested</b></td>
+                            <td><b>stake acquired</b></td>
+                            <td><b>partners</b></td>
+                        </tr>
+                        {% for d in deal_list %}
+                            <tr style="height: 50px;">
+                                <td style="vertical-align: middle;">
+                                    {% set link = '/company/' ~ d['COID'] %}
+                                    <a href={{ link }}>{{ d['name'] }}</a>
+                                </td>
+                                <td>{{ d['deal_dollars'] }}</td>
+                                <td>{{ d['deal_pct'] }}</td>
+                                <td>
+                                    {% if d['partners']|length>0 %}
+                                        {% for p in d['partners'] %}
+                                            {% set company_link = '/company/' ~ COID %}
+                                            {% set partner_button = "<a href=/investor/" ~ p['SID'] ~ " class='btn btn-default btn-circle'><b>" ~ p['initials'] ~ "</b></a>" %}
+                                            {{ partner_button | safe}}
+                                        {% endfor %}
+                                    {% endif %}
+                                
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+                /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var url = location.href;
+                    var start = url.indexOf("/investor/")+10;
+                    var COID = url.slice(start);
+                    var disqus_shortname = 'sharkalytics'; 
+                    var disqus_identifier = COID;
+                    var disqus_title = 'sharkalytics: {{ name }}';
+                // DON'T EDIT BELOW THIS LINE
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    {% endblock %}

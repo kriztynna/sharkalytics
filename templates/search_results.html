@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: search results</title>
+    {% endblock%}
+
+    {% block body %}
+      <div class="card top-card">
+        <div class="card-title">search results: {{ search_terms }}</div>
+      </div>
+
+      <div id="results"></div>
+
+        <!-- JavaScript -->
+        <script type="text/javascript">
+            function insertResults(){
+                if (request.readyState == 4 && request.status == 200){
+                    var JSONdata = JSON.parse(request.responseText);
+                    var co_results = JSONdata.co_results;
+                    var cat_results = JSONdata.cat_results;
+                    var shark_results = JSONdata.shark_results;
+                    var counts = JSONdata.counts;
+
+                    if (counts['co_count']>0) {
+                      var co_text = '<div class="card"><div class="card-title">companies</div><table class="table table-condensed"><tbody>';
+                      for (co in co_results) { 
+                        var link = '<tr><td><a href=/company/'+co+'>'+co_results[co]+'</a></td></tr>';
+                        co_text = co_text.concat(link);
+                      }
+                      co_text = co_text.concat('</tbody></table></div>')
+                      $( "#results" ).append( $( co_text ) );
+                    }
+
+                    if (counts['cat_count']>0) {
+                      var cat_text = '<div class="card"><div class="card-title">categories</div><table class="table table-condensed"><tbody>';
+                      for (cat in cat_results) { 
+                        var link = '<tr><td><a href=/category/'+cat+'>'+cat_results[cat]+'</a></td></tr>';
+                        cat_text = cat_text.concat(link);
+                      }
+                      cat_text = cat_text.concat('</tbody></table></div>')
+                      $( "#results" ).append( $( cat_text ) );
+                    }
+
+                    if (counts['shark_count']>0) {
+                      var shark_text = '<div class="card"><div class="card-title">sharks</div><table class="table table-condensed"><tbody>';
+                      for (shark in shark_results) { 
+                        var link = '<tr><td><a href=/investor/'+shark+'>'+shark_results[shark]+'</a></td></tr>';
+                        shark_text = shark_text.concat(link);
+                      }
+                      shark_text = shark_text.concat('</tbody></table></div>')
+                      $( "#results" ).append( $( shark_text ) );
+                    }
+                }
+            }
+
+            function getSearchResults(){
+                request = new XMLHttpRequest();
+                request.onreadystatechange = insertResults;
+                var req = 'searchresults?search_terms={{ search_terms }}';
+                var encoded_req = encodeURI(req);
+                request.open("GET",encoded_req,true);
+                request.send();
+            }
+
+            document.body.onload=getSearchResults;
+
+        </script>
+
+    {% endblock %}
+</html>

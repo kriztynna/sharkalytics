@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>admin: review edits</title>
+        <style>
+        .alert {
+            display: none;
+        }
+        </style>
+    {% endblock%}
+
+    {% block body %}
+        <h2>edits pending approval</h2>
+        <div id="confirm_div"></div>
+        <div id="form-div"></div>
+
+        <!-- Javascript -->
+        <script type="text/javascript">
+            var changes = {{ changes|safe }};
+            var submit = {{ submit }};
+        </script>
+        <script type="text/javascript" src='/static/js/reviewedits.js'></script>
+
+    {% endblock %}

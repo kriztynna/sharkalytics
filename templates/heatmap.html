@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+  {% block head %}
+    <title>sharkalytics: group deals</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <style>
+      #heatmap {
+      }
+      rect.bordered {
+        stroke: #f7fcfd;
+        stroke-width:2px;   
+      }
+
+      text.axisLabel {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 85%;
+        font-weight: 300;
+      }
+
+      text.axisLabel:hover {
+        font-weight: 700;
+      }
+
+      a:hover {
+        text-decoration: none;
+      }
+
+      .d3-tip {
+        line-height: 1;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 700;
+        font-size: 85%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+      }
+
+      /* Creates a small triangle extender for the tooltip */
+      .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 85%;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+      }
+
+      /* Style northward tooltips differently */
+      .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+      }
+
+    </style>
+    <!-- og meta tags -->
+    <meta property="og:title" content="A visualization of every group deal on Shark Tank" />
+    <meta property="og:description" content="For all their competitive antics, the sharks sure buddy-up on a lot of deals. See who likes to team up, and who their favorite partners appear to be." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="http://www.sharkalytics.com/static/images/groupdealsviz.png" />
+  {% endblock%}
+
+  {% block body %}
+    <div class="card top-card">
+      <span class="card-title">Shark Tank group deal heatmap</span>
+    </div>
+
+    <div class="card">
+      <div class="card-text">
+        <p>
+          Despite their competitive antics, the sharks have actually teamed up on numerous deals. The heatmap below illustrates how often each shark goes into group deals and who they tend to partner up with. The list of sharks runs across the top, and down the left side, ranked from most to fewest total group deals. The further a name is to the top or to the left of the chart, the more group deals that shark has. 
+        </p>
+        <p>
+          Each square corresponds to a combination of two sharks. <strong>Click</strong> to see the list of companies that this pair sharks has invested in together and how much they invested.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="small-title"><b>Despite their competitive antics, the sharks have actually teamed up on numerous deals. </b></span>
+      <div id="heatmap"></div>
+    </div>
+
+    <div class="card" id="note">
+      <span class="small-title"></span>
+      <div class="card-text">
+        <p>
+          This visualization was created on February 03, 2015. It is current as of {{ last_ep_date }}, when episode {{ epnumber }} of season {{ season }} aired.
+        </p>
+      </div>
+    </div>
+
+    <div id="disqus_thread"></div>
+
+    <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                var url = location.href;
+                var disqus_shortname = 'sharkalytics'; 
+                var disqus_identifier = 'sharkalytics group deals heatmap';
+                var disqus_title = 'Sharkalytics: Shark Tank group deals heatmap';
+            // DON'T EDIT BELOW THIS LINE
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+      <script type="text/javascript">
+        var margin = { top: 50, right: 0, bottom: 20, left: 80 },
+            width = parseInt(d3.select('.card').style('width'), 10) - 154, // seems to work
+            height = width,
+            gridSize = Math.floor(width / 7),
+            colors = ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#006d2c","#00441b"], // alternatively colorbrewer.BuGn[9]
+            buckets = colors.length,
+            sharks = {{ shark_list | safe }},
+            SID = {{ SID_list | safe }};
+
+        // formatters
+        var formatValue = d3.format(",f");
+
+        // setup fill color
+        var cValue = function(d) { return d.value;},
+            colorScale = d3.scale.category20();
+
+        // list the pair's deals function
+        var insertDealsCard = function(){
+          if (request.readyState == 4 && request.status == 200){
+            var JSONdata = JSON.parse(request.responseText);
+            var keys = Object.keys(JSONdata);
+
+            var deals = JSONdata['deals'];
+            var deal_keys = Object.keys(deals);
+            deal_keys.sort();
+
+            if (deal_keys.length>0){
+              var contents = '<div class="small-title"><strong><a href="/investor/'+JSONdata['SID1']+'">'+JSONdata['shark1name']+'</a> and <a href="/investor/'+JSONdata['SID2']+'">'+JSONdata['shark2name']+'</a></strong></div><br><table class="table table-condensed"><tbody><tr><td><b>company</b></td><td><b>dollars invested</b></td><td><b>equity stake</b></td></tr>';
+              for (i=0; i<deal_keys.length; i++) {
+                k = deal_keys[i];
+                deal = deals[k];
+                contents = contents+'<tr><td><a href="/company/'+k+'">'+deal['co_name']+'</a></td><td>'+deal['deal_usd']+'</td><td>'+deal['deal_pct']+'</td></tr>';
+              }
+              var contents = contents + '</tbody></table></div>';
+            }
+            else {var contents = 'No deals between <a href=/investor/"'+JSONdata['SID1']+'">'+JSONdata['shark1name']+'</a> and <a href="/investor/'+JSONdata['SID2']+'">'+JSONdata['shark2name']+'</a>.'}
+
+            var deals_card = '<div class="card" id="deals_card"></div>';
+
+            if (! $('#deals_card').html() ){
+              $( "#note" ).before( $( deals_card ) );
+            }
+            
+            $('#deals_card').html( contents )
+            var req = '#deals_card';
+            window.open(req, "_self");
+          }
+        };
+
+        var getGroupDealData = function (shark1, shark2) {
+          if (shark1!=shark2){
+            request = new XMLHttpRequest();
+            request.onreadystatechange = insertDealsCard;
+            var req = '/'+'pairsdeals'+'?shark1='+shark1+'&shark2='+shark2;
+            var encoded_req = encodeURI(req);
+            request.open("GET",encoded_req,true);
+            request.send();
+          }
+        };
+
+
+        d3.tsv("/chartdata/heatmap",
+
+          function(d) {
+            return {
+              shark1: d.shark1,
+              shark2: d.shark2,
+              value: +d.value,
+              shark1_index: +d.shark1_index,
+              shark2_index: +d.shark2_index
+            };
+          },
+
+          function(error, data) {
+
+            var colorScale = d3.scale.quantile()
+                .domain([-5, d3.max(data, function (d) { return d.value; })])
+                .range(colors); 
+
+            var svg = d3.select("#heatmap").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var vAxisLabels = svg.selectAll(".vAxisLabel")
+                .data(sharks)
+                .enter()
+                  .append("a")
+                    .attr("xlink:href", function(d, i) {return "/investor/"+SID[i]})
+                    .attr("xlink:show", "new")
+                  .append("text")
+                    .html(function (d) { return d; })
+                    .attr("x", 0)
+                    .attr("y", function (d, i) { return i * gridSize; })
+                    .style("text-anchor", "end")
+                    .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+                    .attr("class", "axisLabel");
+
+            var hAxisLabels = svg.selectAll(".hAxisLabel")
+                .data(sharks)
+                .enter()
+                  .append("a")
+                    .attr("xlink:href", function(d, i) {return "/investor/"+SID[i]})
+                  .append("text")
+                    .text(function(d) { return d; })
+                    .attr("x", function(d, i) { return i * gridSize; })
+                    .attr("y", 0)
+                    .style("text-anchor", "middle")
+                    .style("dy", 0)
+                    .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+                    .attr("class", "axisLabel");
+
+            svg.selectAll('.axisLabel').call(wrap, Math.min(77, gridSize-5));
+
+            // add the tooltip area to the webpage
+            var tip = d3.tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {if (d.value>=0) { return "<span>"+formatValue(d.value)+"</span>";} else {return "<span>n/a</span>";} })
+
+            svg.call(tip);
+
+            var heatMap = svg.selectAll(".hour")
+                .data(data)
+                .enter()
+                  .append("rect")
+                    .attr("x", function(d) { return (d.shark2_index - 1) * gridSize; })
+                    .attr("y", function(d) { return (d.shark1_index - 1) * gridSize + 15; })
+                    .attr("rx", 4)
+                    .attr("ry", 4)
+                    .attr("class", "hour bordered")
+                    .attr("width", gridSize)
+                    .attr("height", gridSize)
+                    .style("fill", colors[0])
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide)
+                    .on('click', function(d) { getGroupDealData(d.shark1, d.shark2) } );
+
+            heatMap.transition().duration(1000)
+                .style("fill", function(d) { return colorScale(d.value); });
+
+        });
+        
+        function wrap(text, width) {
+          text.each(function() {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1, // ems
+                x = text.attr("x"),
+                y = text.attr("y"),
+                dy = 0,
+                tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+              line.push(word);
+              tspan.text(line.join(" "));
+              if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+              }
+            }
+          });
+        }
+
+      </script>
+
+
+
+  {% endblock %}

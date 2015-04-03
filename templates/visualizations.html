@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: Shark Tank data visualizations</title>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <!-- og meta tags -->
+        <meta property="og:title" content="Visualizations from Shark Tank data" />
+        <meta property="og:description" content="Sharkalytics has compiled a wealth of data over the course of Shark Tank's run, feeding it into the interactive visualizations featured here." />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="http://www.sharkalytics.com/static/images/dealsviz.png" />
+        <meta property="og:image" content="http://www.sharkalytics.com/static/images/groupdealsviz.png" />
+    {% endblock%}
+
+    {% block body %}
+        <div class="card top-card">
+          <span class="card-title">Shark Tank visualizations gallery</span>
+        </div>
+
+        <div class="card">
+            <div class="card-text">
+            <p>
+                Sharkalytics is the destination for <i>Shark Tank</i> fans who care about the numbers as much as the sharks themselves do. We have compiled a wealth of data over the course of the show's run, and our collection feeds the interactive and dynamically updated visualizations featured in this gallery. 
+            </p>
+            <p>
+                If you are a <i>Shark Tank</i> fan, a visualization maven, or both, we'd love to hear from you. <a href="#heatmap"><strong>Explore</strong></a> the gallery, <a href="/sharks"><strong>browse</strong></a> the site, and <strong><a href="mailto:admin@sharkalytics.com" target="_blank">drop us a line</a></strong> if you'd like access to some of our data for a project of your own.
+            </p>
+            </div>
+        </div>
+
+        <div class="card" id="heatmap">
+            <span class="small-title"><strong>Group deals heatmap</strong></span>
+            <div class="card-text">
+                <p>
+                    For all their competitive antics, the sharks sure buddy-up on a lot of deals. See who likes to team up, and who their favorite partners appear to be.
+                    <a href="/heatmap"><strong>Explore the heatmap.</strong></a>
+                </p>
+            </div>
+            <br>
+            <a href="/heatmap"><img src="/static/images/groupdealsvizthumb.png" style="max-width: 100%;" /></a>
+        </div>
+
+        <div class="card" id="scatterplot">
+            <span class="small-title"><strong>Asking vs. deal valuations</strong></span>
+            <div class="card-text">
+                <p>
+                How much do Shark Tank entrepreneurs think they're worth? Expectations collide with reality in this plot of every deal struck on the show.
+                <a href="/deals"><strong>Explore the deals scatterplot.</strong></a>
+                </p>
+            </div>
+            <br>
+            <a href="/deals"><img src="/static/images/dealsvizthumb.png" width="100%" /></a>
+        </div>
+
+        <div id="disqus_thread"></div>
+
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                var url = location.href;
+                var disqus_shortname = 'sharkalytics'; 
+                var disqus_identifier = 'Sharkalytics visualization gallery';
+                var disqus_title = 'Sharkalytics visualization gallery';
+            // DON'T EDIT BELOW THIS LINE
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    {% endblock %}

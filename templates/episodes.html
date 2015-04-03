@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+    {% block head %}
+        <title>sharkalytics: Shark Tank data by episode</title>
+    {% endblock%}
+
+    {% block body %}
+    <div class="card top-card">
+      <span class="card-title">Shark Tank data by episode</span>
+    </div>
+
+    <div class="card">
+        <table class="table table-condensed">
+          <tbody>
+            <tr>
+              <td><b>Season 1</b></td>
+              <td><b>Season 2</b></td>
+              <td><b>Season 3</b></td>
+              <td><b>Season 4</b></td>
+              <td><b>Season 5</b></td>
+              <td><b>Season 6</b></td>
+            </tr>
+            {% for row in range(amount_of_rows) %}
+               <tr>
+                 <td>
+                 {% if loop.index<=ep_count_by_season[1]|length %}
+                     {% set link='/episode/' ~  ep_count_by_season[1][loop.index0][0] %}
+                     <a href={{ link }}>Episode {{ ep_count_by_season[1][loop.index0][1] }}</a>
+                  {% endif %}
+                 </td>
+                 <td>
+                 {% if loop.index<=ep_count_by_season[2]|length %}
+                     {% set link='/episode/' ~  ep_count_by_season[2][loop.index0][0] %}
+                     <a href={{ link }}>Episode {{ ep_count_by_season[2][loop.index0][1] }}</a>
+                 {% endif %}
+                 </td>
+                 <td>
+                 {% if loop.index<=ep_count_by_season[3]|length %}
+                     {% set link='/episode/' ~  ep_count_by_season[3][loop.index0][0] %}
+                     <a href={{ link }}>Episode {{ ep_count_by_season[3][loop.index0][1] }}</a>
+                 {% endif %}
+                 </td>
+                 <td>
+                 {% if loop.index<=ep_count_by_season[4]|length %}
+                     {% set link='/episode/' ~  ep_count_by_season[4][loop.index0][0] %}
+                     <a href={{ link }}>Episode {{ ep_count_by_season[4][loop.index0][1] }}</a>
+                 {% endif %}
+                 </td>
+                 <td>
+                 {% if loop.index<=ep_count_by_season[5]|length %}
+                     {% set link='/episode/' ~  ep_count_by_season[5][loop.index0][0] %}
+                     <a href={{ link }}>Episode {{ ep_count_by_season[5][loop.index0][1] }}</a>
+                 {% endif %}
+                 </td>
+                 <td>
+                 {% if loop.index<=ep_count_by_season[6]|length %}
+                     {% set link='/episode/' ~  ep_count_by_season[6][loop.index0][0] %}
+                     <a href={{ link }}>Episode {{ ep_count_by_season[6][loop.index0][1] }}</a>
+                 {% endif %}
+                 </td>
+               </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endblock %}
+</html>
